@@ -1,6 +1,5 @@
 package cn.xmu.edu.gxj.matchpre.kafka;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Properties;
 
@@ -11,7 +10,6 @@ import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.Producer;
 import org.apache.kafka.clients.producer.ProducerRecord;
-import org.apache.kafka.common.TopicPartition;
 
 public class Kc {
 
@@ -38,7 +36,7 @@ public class Kc {
 	 }
 	
 	public static void main(String[] args) {
-		produce();
+//		produce();
 		consume();
 	}
 	
@@ -52,11 +50,14 @@ public class Kc {
 	     props.put("key.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 	     props.put("value.deserializer", "org.apache.kafka.common.serialization.StringDeserializer");
 	     KafkaConsumer<String, String> consumer = new KafkaConsumer<>(props);
-	     consumer.subscribe(Arrays.asList("matchp"));
+	     consumer.subscribe(Arrays.asList("lofter"));
          ConsumerRecords<String, String> records = consumer.poll(10000);
          System.out.println(records.count());
-         for (ConsumerRecord<String, String> record : records)
-             System.out.printf("offset = %d, key = %s, value = %s,", record.offset(), record.key(), record.value());
-	}
+         for (ConsumerRecord<String, String> record : records){
+        	 String value = record.value();
+        	 System.out.printf("offset = %d, key = %s, value = %s,", record.offset(), record.key(), record.value());
+
+         }
+    }
 
 }
