@@ -12,7 +12,8 @@ public class MatchpConfig {
 	private static String KAFKA_CON_STR ;
 	private static String KAFKA_ZK_CON_STR;
 	private static String STORM_ZK_SERVER;
-	private static int STORM_ZK_PORT; 
+	private static int STORM_ZK_PORT;
+	private static String MATCHP_SERVICE_IP;
 
 	
 	static{
@@ -29,6 +30,7 @@ public class MatchpConfig {
 			KAFKA_ZK_CON_STR = getKey(properties, "ZK_CON_STR");
 			STORM_ZK_SERVER = getKey(properties, "STORM_ZK_SERVER");
 			STORM_ZK_PORT = Integer.parseInt(getKey(properties, "STORM_ZK_PORT"));
+			MATCHP_SERVICE_IP = getKey(properties, "MATCHP_SERVICE_IP");
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -82,5 +84,12 @@ public class MatchpConfig {
 		STORM_ZK_PORT = sTORM_ZK_PORT;
 	}
 
+	public static String getMATCHP_SERVICE_IP() {
+		return MATCHP_SERVICE_IP;
+	}
+
+	public static void setMATCHP_SERVICE_IP(String mATCHP_SERVICE_IP) {
+		MATCHP_SERVICE_IP = mATCHP_SERVICE_IP;
+	}
 	
 }

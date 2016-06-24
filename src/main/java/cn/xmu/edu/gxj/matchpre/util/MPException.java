@@ -10,6 +10,12 @@ public class MPException extends Exception{
 		this.ErrCode = ErrCode;
 	}
 	
+	public MPException(int ErrCode,String Message){
+		super();
+		this.Message = Message;
+		this.ErrCode = ErrCode;
+	}
+	
 	public String getMessage() {
 		return Message;
 	}

@@ -7,7 +7,7 @@ import org.apache.storm.LocalCluster;
 import org.apache.storm.generated.StormTopology;
 import org.apache.storm.topology.TopologyBuilder;
 
-import cn.xmu.edu.gxj.matchpre.util.Fields;
+import cn.xmu.edu.gxj.matchpre.util.ConStant;
 import cn.xmu.edu.gxj.matchpre.util.MatchpConfig;
 
 
@@ -19,10 +19,14 @@ public class Topology {
 		
 		TopologyBuilder builder = new TopologyBuilder();
 		
-		builder.setSpout(Fields.LOFTER_SPOUT, SpoutFactory.buildSpout(Fields.LOFTER_TOPIC, Fields.LOFTER_SPOUT));
+		builder.setSpout(ConStant.LOFTER_SPOUT, SpoutFactory.buildSpout(ConStant.LOFTER_TOPIC, ConStant.LOFTER_SPOUT));
 //		builder.setSpout(Fields., spout)
 		
-		builder.setBolt(Fields.LOGGER_BOLT, new LoggerBolt()).shuffleGrouping(Fields.LOFTER_SPOUT);
+		builder.setBolt(ConStant.LOGGER_BOLT, new LoggerBolt()).shuffleGrouping(ConStant.LOFTER_SPOUT);
+		builder.setBolt(ConStant.HIST_BOLT, new HistBolt()).shuffleGrouping(ConStant.LOGGER_BOLT);
+		builder.setBolt(ConStant.IMG_SIGN_BOLT, new ImageHashBolt()).shuffleGrouping(ConStant.HIST_BOLT);
+		builder.setBolt(ConStant.OCR_BOLT, new OcrBolt()).shuffleGrouping(ConStant.IMG_SIGN_BOLT);
+		builder.setBolt(ConStant.SAR_BOLT, new SarBolt()).shuffleGrouping(ConStant.OCR_BOLT);
 		
 		System.out.println("done");
 		
