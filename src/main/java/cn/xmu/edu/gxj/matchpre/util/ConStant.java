@@ -22,4 +22,10 @@ public class ConStant {
 	
 	public static final String IMG_FIELD = "img";
 	public static final String TEXT_FIELD = "text";
+	public static final String SEN_FIELD = "polarity";
+	public static final String SIGN_FIELD = "imgSign";
+	public static final String HIST_FIELD = "hist";
+	public static final String SAR_FIELD = "sar";
+	public static final String OCR_FIELD = "ocr";
+	public static final String SIZE_FIELD = "imgSize";
 }

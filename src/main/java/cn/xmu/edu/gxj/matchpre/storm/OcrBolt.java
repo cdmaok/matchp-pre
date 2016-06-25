@@ -23,6 +23,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 
 import cn.xmu.edu.gxj.matchpre.model.Reply;
 import cn.xmu.edu.gxj.matchpre.util.ConStant;
@@ -38,11 +39,10 @@ public class OcrBolt extends BaseRichBolt{
 	 */
 	private Logger logger = LoggerFactory.getLogger(OcrBolt.class);
 	private CloseableHttpClient  httpclient;
-	private String image_url = "http://" + MatchpConfig.getMATCHP_SERVICE_IP() + "/ocr/";
+	private String url = "http://" + MatchpConfig.getMATCHP_SERVICE_IP() + "/ocr/";
 	private HttpPost post ;
 	private OutputCollector collector;
 	
-	private final String ocrLen = "ocr";
 
 	
 	@Override
@@ -61,33 +61,26 @@ public class OcrBolt extends BaseRichBolt{
             	String arrayStr = "";
             	if (reply.getCode() == 200) {
 					arrayStr = reply.getMessage();
-					json = JsonUtility.setAttribute(json, ocrLen, arrayStr.split(","));
+					json = JsonUtility.setAttribute(json, ConStant.OCR_FIELD, arrayStr.split(","));
 					logger.info("ocr length : {}" , arrayStr);
 					collector.emit(new Values(json));
+					collector.ack(arg0);
 				} 
             }else{
             	throw new MPException(ErrCode.Invalid_IMG, img + " is valid.");
             } 
             response.close();
-		} catch (MPException e) {
+		} catch (MPException | JsonSyntaxException | IOException e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-			logger.error(e.getMessage());
-		} catch (ClientProtocolException e) {
-			e.printStackTrace();
-			logger.error(e.getMessage());
-		} catch (IOException e) {
-			e.printStackTrace();
-			logger.error(e.getMessage());
-		}
+			collector.fail(arg0);
+		} 
 	}
 
 	@Override
 	public void prepare(Map arg0, TopologyContext arg1, OutputCollector arg2) {
 		httpclient = HttpClients.createDefault();
-		post = new HttpPost(image_url);
+		post = new HttpPost(url);
 		post.addHeader("content-type", "application/json");
 		this.collector = arg2;
 	}

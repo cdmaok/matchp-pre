@@ -32,14 +32,14 @@ import cn.xmu.edu.gxj.matchpre.util.JsonUtility;
 import cn.xmu.edu.gxj.matchpre.util.MPException;
 import cn.xmu.edu.gxj.matchpre.util.MatchpConfig;
 
-public class ImageHashBolt extends BaseRichBolt{
+public class SenBolt extends BaseRichBolt{
 
 	/*
-	 * this bolt is to add image hash signature.
+	 * this bolt is to get sentiment of text
 	 */
-	private Logger logger = LoggerFactory.getLogger(ImageHashBolt.class);
+	private Logger logger = LoggerFactory.getLogger(SenBolt.class);
 	private CloseableHttpClient  httpclient;
-	private String url = "http://" + MatchpConfig.getMATCHP_SERVICE_IP() + "/image/";
+	private String url = "http://" + MatchpConfig.getMATCHP_SERVICE_IP() + "/snow/";
 	private HttpPost post ;
 	private OutputCollector collector;
 	
@@ -48,29 +48,30 @@ public class ImageHashBolt extends BaseRichBolt{
 	@Override
 	public void execute(Tuple arg0) {
 		String json = arg0.getStringByField(ConStant.FIELD);
+		String jsonText;
 		try {
-			String img = JsonUtility.getAttributeasStr(json, ConStant.IMG_FIELD);
-			String jsonText = JsonUtility.newJsonString("image", img);
+			String text = JsonUtility.getAttributeasStr(json, ConStant.TEXT_FIELD);
+			jsonText = JsonUtility.newJsonString(ConStant.TEXT_FIELD, text);
 			StringEntity params = new StringEntity(jsonText, "utf-8");
 			post.setEntity(params);
 			CloseableHttpResponse response = httpclient.execute(post);
 			HttpEntity entity = response.getEntity();
             if (entity != null) {
             	String replyStr = EntityUtils.toString(entity,"UTF-8");
+				logger.info("text sar : {}/{}" , jsonText,replyStr);
             	Reply reply = new Gson().fromJson(replyStr, Reply.class);
             	String arrayStr = "";
             	if (reply.getCode() == 200) {
 					arrayStr = reply.getMessage();
-					json = JsonUtility.setAttribute(json, ConStant.SIGN_FIELD, arrayStr);
-					logger.info("image sign: {}" , arrayStr);
+					json = JsonUtility.setAttribute(json, ConStant.SEN_FIELD, arrayStr);
 					collector.emit(new Values(json));
 					collector.ack(arg0);
 				} 
             }else{
-            	throw new MPException(ErrCode.Invalid_IMG, img + " is valid.");
+            	throw new MPException(ErrCode.Invalid_TEXT, text + " is valid.");
             } 
             response.close();
-		} catch (MPException | JsonSyntaxException | IOException e) {
+		} catch (MPException | JsonSyntaxException |IOException e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());
 			collector.fail(arg0);

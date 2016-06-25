@@ -14,6 +14,7 @@ public class MatchpConfig {
 	private static String STORM_ZK_SERVER;
 	private static int STORM_ZK_PORT;
 	private static String MATCHP_SERVICE_IP;
+	private static String MATCHP_IP;
 
 	
 	static{
@@ -31,6 +32,7 @@ public class MatchpConfig {
 			STORM_ZK_SERVER = getKey(properties, "STORM_ZK_SERVER");
 			STORM_ZK_PORT = Integer.parseInt(getKey(properties, "STORM_ZK_PORT"));
 			MATCHP_SERVICE_IP = getKey(properties, "MATCHP_SERVICE_IP");
+			MATCHP_IP = getKey(properties, "MATCHP_IP");
 			
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -90,6 +92,14 @@ public class MatchpConfig {
 
 	public static void setMATCHP_SERVICE_IP(String mATCHP_SERVICE_IP) {
 		MATCHP_SERVICE_IP = mATCHP_SERVICE_IP;
+	}
+
+	public static String getMATCHP_IP() {
+		return MATCHP_IP;
+	}
+
+	public static void setMATCHP_IP(String mATCHP_IP) {
+		MATCHP_IP = mATCHP_IP;
 	}
 	
 }
