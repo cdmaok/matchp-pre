@@ -16,7 +16,8 @@ public class LoggerBolt extends BaseBasicBolt{
 	
 	@Override
 	public void execute(Tuple input, BasicOutputCollector collector) {
-		logger.info(input.getStringByField(ConStant.FIELD));
+		String string = input.getStringByField(ConStant.FIELD);
+		logger.info(string);
 	}
 
 	@Override

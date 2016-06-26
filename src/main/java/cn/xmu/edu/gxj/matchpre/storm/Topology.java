@@ -29,7 +29,7 @@ public class Topology {
 		builder.setSpout(ConStant.LOFTER_SPOUT, SpoutFactory.buildSpout(ConStant.LOFTER_TOPIC, ConStant.LOFTER_SPOUT));
 		
 		builder.setBolt(ConStant.FETCH_BOLT, new FetchBolt()).shuffleGrouping(ConStant.LOFTER_SPOUT);
-		builder.setBolt(ConStant.HIST_BOLT, new HistBolt()).shuffleGrouping(ConStant.FETCH_BOLT);
+		builder.setBolt(ConStant.HIST_BOLT, new HistBolt(),5).shuffleGrouping(ConStant.FETCH_BOLT);
 		builder.setBolt(ConStant.IMG_SIGN_BOLT, new ImageHashBolt()).shuffleGrouping(ConStant.HIST_BOLT);
 		builder.setBolt(ConStant.OCR_BOLT, new OcrBolt(),5).shuffleGrouping(ConStant.IMG_SIGN_BOLT);
 		builder.setBolt(ConStant.SAR_BOLT, new SarBolt(),2).shuffleGrouping(ConStant.OCR_BOLT);

@@ -19,13 +19,16 @@ public class MatchpConfig {
 	
 	static{
 		String FileName = "/config.properties";
-		String FilePath = MatchpConfig.class.getResource(FileName).getPath();
-		
-		logger.info("reading config file from {}",FilePath);
+//		change to read from stream instead of reading file.
+//		String FilePath = MatchpConfig.class.getResource(FileName).getPath();
+//		logger.info("reading config file from {}",FilePath);
 
 		Properties properties = new Properties();
 		try {
-			properties.load(new FileInputStream(FilePath));
+//			properties.load(new FileInputStream(FilePath));
+			boolean jar = isJar();
+			
+			properties.load(MatchpConfig.class.getResourceAsStream(FileName));
 			
 			KAFKA_CON_STR = getKey(properties, "KAFKA_CON_STR");
 			KAFKA_ZK_CON_STR = getKey(properties, "ZK_CON_STR");
@@ -41,6 +44,15 @@ public class MatchpConfig {
 		
 	}
 	
+	public static boolean isJar(){
+		boolean flag = false;
+		String cp = MatchpConfig.class.getResource("/config.properties").toString();
+		if (cp.startsWith("jar")) {
+			flag = true;
+		}
+		return flag;
+	}
+	
 	public static String getKey(Properties prop,String key) throws MPException{
 		if (prop == null || !prop.containsKey(key)) {
 			throw new MPException("missing field " + key + " in file", ErrCode.Missing_Field);
@@ -52,6 +64,7 @@ public class MatchpConfig {
 //		MatchpConfig.
 		System.out.println(MatchpConfig.getKAFKA_CON_STR());
 		System.out.println(MatchpConfig.getKAFKA_ZK_CON_STR());
+		System.out.println(MatchpConfig.getSTORM_ZK_SERVER());
 	}
 
 	public static String getKAFKA_CON_STR() {
