@@ -26,12 +26,13 @@ import cn.xmu.edu.gxj.matchpre.model.Reply;
 import cn.xmu.edu.gxj.matchpre.util.ConStant;
 import cn.xmu.edu.gxj.matchpre.util.ErrCode;
 import cn.xmu.edu.gxj.matchpre.util.MPException;
+import cn.xmu.edu.gxj.matchpre.util.MatchpConfig;
 
 public class IndexBolt extends BaseRichBolt{
 	
 	private CloseableHttpClient client;
 	private Logger logger = LoggerFactory.getLogger(IndexBolt.class);
-	private String url;
+	private String url = "http://" + MatchpConfig.getMATCHP_IP();
 	private HttpPost post;
 	private OutputCollector collector;
 
@@ -72,5 +73,14 @@ public class IndexBolt extends BaseRichBolt{
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
 		declarer.declare(new Fields(ConStant.FIELD));
 	}
+    @Override
+    public void cleanup() {
+    	try {
+    		client.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+    }
 
 }

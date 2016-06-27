@@ -1,30 +1,17 @@
 package cn.xmu.edu.gxj.matchpre.storm;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang3.ArrayUtils;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.NameValuePair;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
-import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.apache.logging.log4j.core.util.Constants;
-import org.apache.storm.shade.org.yaml.snakeyaml.scanner.Constant;
 import org.apache.storm.task.OutputCollector;
 import org.apache.storm.task.TopologyContext;
-import org.apache.storm.topology.BasicOutputCollector;
 import org.apache.storm.topology.OutputFieldsDeclarer;
 import org.apache.storm.topology.base.BaseRichBolt;
 import org.apache.storm.tuple.Fields;
@@ -73,7 +60,7 @@ public class HistBolt extends BaseRichBolt{
             	if (reply.getCode() == 200) {
 					arrayStr = reply.getMessage();
 					
-					json = JsonUtility.setAttribute(json, ConStant.HIST_FIELD, arrayStr.split(","));
+					json = JsonUtility.setAttribute(json, ConStant.HIST_FIELD, arrayStr);
 					logger.info("image hist: {}" , arrayStr);
 					collector.emit(new Values(json));
 		            collector.ack(arg0);
@@ -102,5 +89,15 @@ public class HistBolt extends BaseRichBolt{
 	public void declareOutputFields(OutputFieldsDeclarer arg0) {
 		arg0.declare(new Fields(ConStant.FIELD));
 	}
+	
+    @Override
+    public void cleanup() {
+    	try {
+    		httpclient.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+    } 
 
 }

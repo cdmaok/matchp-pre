@@ -91,4 +91,13 @@ public class SenBolt extends BaseRichBolt{
 		arg0.declare(new Fields(ConStant.FIELD));
 	}
 
+    @Override
+    public void cleanup() {
+    	try {
+    		httpclient.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			logger.error(e.getMessage());
+		}
+    }
 }

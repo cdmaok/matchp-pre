@@ -1,12 +1,18 @@
 package cn.xmu.edu.gxj.matchpre.storm;
 
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
 import java.util.Map;
+
+import javax.imageio.ImageIO;
+import javax.print.DocFlavor.STRING;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
@@ -32,15 +38,12 @@ import cn.xmu.edu.gxj.matchpre.util.JsonUtility;
 import cn.xmu.edu.gxj.matchpre.util.MPException;
 import cn.xmu.edu.gxj.matchpre.util.MatchpConfig;
 
-public class ImageHashBolt extends BaseRichBolt{
+public class ImgSizeBolt extends BaseRichBolt{
 
 	/*
-	 * this bolt is to add image hash signature.
+	 * this bolt is to get image's size
 	 */
-	private Logger logger = LoggerFactory.getLogger(ImageHashBolt.class);
-	private CloseableHttpClient  httpclient;
-	private String url = "http://" + MatchpConfig.getMATCHP_SERVICE_IP() + "/image/";
-	private HttpPost post ;
+	private Logger logger = LoggerFactory.getLogger(ImgSizeBolt.class);
 	private OutputCollector collector;
 	
 
@@ -49,39 +52,24 @@ public class ImageHashBolt extends BaseRichBolt{
 	public void execute(Tuple arg0) {
 		String json = arg0.getStringByField(ConStant.FIELD);
 		try {
-			String img = JsonUtility.getAttributeasStr(json, ConStant.IMG_FIELD);
-			String jsonText = JsonUtility.newJsonString("image", img);
-			StringEntity params = new StringEntity(jsonText, "utf-8");
-			post.setEntity(params);
-			CloseableHttpResponse response = httpclient.execute(post);
-			HttpEntity entity = response.getEntity();
-            if (entity != null) {
-            	String replyStr = EntityUtils.toString(entity,"UTF-8");
-            	Reply reply = new Gson().fromJson(replyStr, Reply.class);
-            	String arrayStr = "";
-            	if (reply.getCode() == 200) {
-					arrayStr = reply.getMessage();
-					json = JsonUtility.setAttribute(json, ConStant.SIGN_FIELD, arrayStr);
-					logger.info("image sign: {}" , arrayStr);
-					collector.emit(new Values(json));
-					collector.ack(arg0);
-				} 
-            }else{
-            	throw new MPException(ErrCode.Invalid_IMG, img + " is valid.");
-            } 
-            response.close();
-		} catch (MPException | JsonSyntaxException | IOException e) {
+			String imgUrl = JsonUtility.getAttributeasStr(json, ConStant.IMG_FIELD);
+			BufferedImage image = ImageIO.read(new URL(imgUrl));
+			double height = image.getHeight();
+			double width = image.getWidth();
+			double size = height / width;
+			json = JsonUtility.setAttribute(json, ConStant.SIZE_FIELD, size);
+			collector.emit(new Values(json));
+			collector.ack(arg0);
+		} catch (MPException | IOException  e) {
 			e.printStackTrace();
 			logger.error(e.getMessage());
 			collector.fail(arg0);
-		} 
+		}
+		
 	}
 
 	@Override
 	public void prepare(Map arg0, TopologyContext arg1, OutputCollector arg2) {
-		httpclient = HttpClients.createDefault();
-		post = new HttpPost(url);
-		post.addHeader("content-type", "application/json");
 		this.collector = arg2;
 	}
 
@@ -89,5 +77,10 @@ public class ImageHashBolt extends BaseRichBolt{
 	public void declareOutputFields(OutputFieldsDeclarer arg0) {
 		arg0.declare(new Fields(ConStant.FIELD));
 	}
+	
+    @Override
+    public void cleanup() {
+
+    } 
 
 }

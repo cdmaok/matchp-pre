@@ -1,11 +1,9 @@
 package cn.xmu.edu.gxj.matchpre.storm;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.util.Map;
 
 import org.apache.http.HttpEntity;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
@@ -32,14 +30,14 @@ import cn.xmu.edu.gxj.matchpre.util.JsonUtility;
 import cn.xmu.edu.gxj.matchpre.util.MPException;
 import cn.xmu.edu.gxj.matchpre.util.MatchpConfig;
 
-public class OcrBolt extends BaseRichBolt{
+public class ImgHashBolt extends BaseRichBolt{
 
 	/*
-	 * this bolt is to do image ocr.
+	 * this bolt is to add image hash signature.
 	 */
-	private Logger logger = LoggerFactory.getLogger(OcrBolt.class);
+	private Logger logger = LoggerFactory.getLogger(ImgHashBolt.class);
 	private CloseableHttpClient  httpclient;
-	private String url = "http://" + MatchpConfig.getMATCHP_SERVICE_IP() + "/ocr/";
+	private String url = "http://" + MatchpConfig.getMATCHP_SERVICE_IP() + "/image/";
 	private HttpPost post ;
 	private OutputCollector collector;
 	
@@ -61,8 +59,8 @@ public class OcrBolt extends BaseRichBolt{
             	String arrayStr = "";
             	if (reply.getCode() == 200) {
 					arrayStr = reply.getMessage();
-					json = JsonUtility.setAttribute(json, ConStant.OCR_FIELD, arrayStr);
-					logger.info("ocr length : {}" , arrayStr);
+					json = JsonUtility.setAttribute(json, ConStant.SIGN_FIELD, arrayStr);
+					logger.info("image sign: {}" , arrayStr);
 					collector.emit(new Values(json));
 					collector.ack(arg0);
 				} 
@@ -99,5 +97,4 @@ public class OcrBolt extends BaseRichBolt{
 			logger.error(e.getMessage());
 		}
     }
-	
 }
