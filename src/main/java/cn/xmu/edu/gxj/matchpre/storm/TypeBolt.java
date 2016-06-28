@@ -60,6 +60,7 @@ public class TypeBolt extends BaseRichBolt{
 				typeStr = ConStant.TUMBLR_TOPIC;
 				break;
 			default:
+				collector.fail(input);
 				throw new MPException(ErrCode.Invalid_TEXT, "unknown type in calculating social score : " + type);
 			}
 			json = JsonUtility.setAttribute(json, ConStant.TYPE_FIELD, typeStr);

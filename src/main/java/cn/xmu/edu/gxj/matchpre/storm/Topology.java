@@ -27,8 +27,10 @@ public class Topology {
 		TopologyBuilder builder = new TopologyBuilder();
 		
 		builder.setSpout(ConStant.LOFTER_SPOUT, SpoutFactory.buildSpout(ConStant.LOFTER_TOPIC, ConStant.LOFTER_SPOUT));
-		
-		builder.setBolt(ConStant.TYPE_BOLT, new TypeBolt()).shuffleGrouping(ConStant.LOFTER_SPOUT);
+		builder.setSpout(ConStant.WEIBO_SPOUT, SpoutFactory.buildSpout(ConStant.WEIBO_TOPIC, ConStant.WEIBO_SPOUT));
+		builder.setSpout(ConStant.TUMBLR_SPOUT, SpoutFactory.buildSpout(ConStant.TUMBLR_TOPIC, ConStant.TUMBLR_SPOUT));
+		builder.setBolt(ConStant.TYPE_BOLT, new TypeBolt()).shuffleGrouping(ConStant.TUMBLR_SPOUT).
+		shuffleGrouping(ConStant.WEIBO_SPOUT).shuffleGrouping(ConStant.LOFTER_SPOUT);
 //		builder.setBolt(ConStant.FETCH_BOLT, new FetchBolt()).shuffleGrouping(ConStant.LOFTER_SPOUT);
 		builder.setBolt(ConStant.HIST_BOLT, new HistBolt(),5).shuffleGrouping(ConStant.TYPE_BOLT);
 		builder.setBolt(ConStant.IMG_SIGN_BOLT, new ImgHashBolt()).shuffleGrouping(ConStant.HIST_BOLT);
@@ -46,6 +48,7 @@ public class Topology {
 		config.setDebug(true);
 		config.put(Config.STORM_ZOOKEEPER_SERVERS, Arrays.asList(MatchpConfig.getSTORM_ZK_SERVER().split(",")));
 		config.put(Config.STORM_ZOOKEEPER_PORT, MatchpConfig.getSTORM_ZK_PORT());
+		config.setMessageTimeoutSecs(30);
 		if (args.length != 1) {
 			logger.error(" need a parameter local model(0) or cluster model(1)");
 			return;
