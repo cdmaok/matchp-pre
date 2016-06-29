@@ -34,6 +34,7 @@ public class ConStant {
 	public static final String SIZE_FIELD = "imgSize"; //used
 	public static final String TYPE_FIELD = "type";  //used
 	public static final String SOSCORE_FIELD = "socialScore"; //used
+	public static final String IMAGE_BYTE = "imagebyte";
 	
 	// some field for social score
 	public static final String WEIBO_GOODS = "goods";

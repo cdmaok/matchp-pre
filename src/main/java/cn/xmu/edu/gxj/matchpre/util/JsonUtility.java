@@ -89,6 +89,25 @@ public class JsonUtility {
 		}
 	}
 	
+	/*
+	 * get byte array attribute from json string
+	 */
+	public static byte[] getAttributeasBinary(String json, String key) throws MPException{
+		ObjectNode node;
+		try {
+			node = mapper.readValue(json, ObjectNode.class);
+			if(node.has(key)){
+				return node.get(key).binaryValue();
+			}else{
+				throw new MPException(ErrCode.Missing_Field, "not found this field " + key + " in " + json);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new MPException(ErrCode.Missing_Field, json + " " + e.getMessage());
+		}
+	}
+	
+	
 	public static String setAttribute(String json, String key, Object value) throws MPException{
 		
 		TypeFactory typeFactory = mapper.getTypeFactory();

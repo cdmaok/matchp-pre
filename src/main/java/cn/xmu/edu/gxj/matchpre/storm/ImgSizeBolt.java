@@ -1,6 +1,7 @@
 package cn.xmu.edu.gxj.matchpre.storm;
 
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
@@ -58,6 +59,15 @@ public class ImgSizeBolt extends BaseRichBolt{
 			double width = image.getWidth();
 			double size = height / width;
 			json = JsonUtility.setAttribute(json, ConStant.SIZE_FIELD, size);
+			
+			ByteArrayOutputStream stream = new ByteArrayOutputStream();
+			String[] splits = imgUrl.split("\\.");
+			String format = splits[splits.length - 1];
+			ImageIO.write(image, format, stream);
+			byte[] bytes = stream.toByteArray();
+			stream.close();
+			json = JsonUtility.setAttribute(json, ConStant.IMAGE_BYTE, bytes);
+			
 			collector.emit(new Values(json));
 			collector.ack(arg0);
 		} catch (MPException | IOException  e) {
